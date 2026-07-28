@@ -1,5 +1,5 @@
 // there are 3 pieces that modern winit revolves around;
-// 1. EventLoop - owns the OS event queue. you create one, then hand control to it by cannling run_app(...)
+// 1. EventLoop - owns the OS event queue. you create one, then hand control to it by calling run_app(...)
 // 2. ApplicationHandler - a trait you implement on your own struct. winit calls the methods as stuff happens.
 // 3. Window - the actual OS window handle, created inside of your handler once the event loop is running.
 
@@ -12,9 +12,10 @@ use winit::{
     keyboard::{KeyCode, PhysicalKey}
 };
 
-// out application state. This holds the window once it is created,
-// it's an option bc there is a brief moment before resumed is called,
+// our application state. This holds the window once it is created,
+// it's an Option bc there is a brief moment before resumed is called,
 // meaning that before resume is called, technically no window exists
+// therefore trying to access window will return None in that brief period
 
 #[derive(Default, Debug)]
 struct App {
@@ -77,11 +78,11 @@ impl ApplicationHandler for App {
 fn main() {
     let event_loop = EventLoop::new().expect("event loop fucked up");
 
-    // constantly poll instead of waiting for OS events. this is a good efault
+    // constantly poll instead of waiting for OS events. this is a good default
     // for apps that need to render every frame. use `Wait` for GUIs that only
     // need to be redrawn upon inputs.
     event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
 
     let mut app = App::default();
-    event_loop.run_app(&mut app).expect("event loop err");
+    event_loop.run_app(&mut app).expect("event loop error");
 }
